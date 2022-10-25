@@ -11,13 +11,17 @@ const addNewPost = async (post) => {
   await Api.post('/posts', post, { headers: {'Content-type': 'application/json; charset=UTF-8'} })
 }
 
+const updatePost = async (post) => {
+  await Api.put(`/posts/${post.id}`, post, { headers: {'Content-type': 'application/json; charset=UTF-8'} })
+}
+
 const getPosts = async () => {
   const { data } = await Api.get('/posts')
   return data
 }
 
-const Home = ({ posts, handleDeletePost, handleEditPost }) => {
-    return (
+const Home = ({ posts, handleDeletePost, editPost }) => {
+  return (
     <Box>
       <Link to='/new-post' style={{ textDecoration: 'none' }}>
         <Button
@@ -33,7 +37,7 @@ const Home = ({ posts, handleDeletePost, handleEditPost }) => {
         posts.length < 1 && <Loader />
       }
       {
-        posts.length > 0 && <Posts posts={posts} deletePost={handleDeletePost} editPost={handleEditPost}/>
+        posts.length > 0 && <Posts posts={posts} deletePost={handleDeletePost} editPost={editPost}/>
       }
     </Box>
   );
@@ -43,7 +47,9 @@ const App = () => {
   const [posts, setPosts] = useState([])
 
   const handleDeletePost = async (postId) => {
-    await Api.delete(`/posts/${postId}`)
+    console.log(postId)
+    const res = await Api.delete(`/posts/${postId}`)
+    console.log(res)
     setPosts(posts.filter(post => post.id !== postId))
   }
 
@@ -53,8 +59,13 @@ const App = () => {
     setPosts(newPosts)
   }
 
-  const handleEditPost = (post) => {
-    console.log(post)
+  const handleEditPost = async (post) => {
+    //await updatePost(post)
+    const newPosts = posts.map(el => {
+      if(el.id === post.id) return post
+      return el
+    })
+    setPosts(newPosts)
   }
 
   useEffect(() => {
@@ -71,7 +82,7 @@ const App = () => {
         </Typography>
       </Link>
       <Routes>
-        <Route path='/' exact element={<Home posts={posts} handleDeletePost={handleDeletePost} />} handleEditPost={handleEditPost}/>
+        <Route path='/' exact element={<Home posts={posts} handleDeletePost={handleDeletePost} editPost={handleEditPost}/>} />
         <Route path='new-post' exact element={<NewPost posts={posts} newPost={handleNewPost}/>}/>
       </Routes>
     </Box>

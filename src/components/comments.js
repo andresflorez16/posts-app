@@ -8,7 +8,6 @@ import {
   Paper,
   TableContainer,
   TablePagination,
-  Typography
 } from '@mui/material'
 import Api from '../api'
 import LoaderRows from './loader-rows'

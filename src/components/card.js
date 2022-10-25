@@ -12,6 +12,7 @@ import DeleteOutlined from '@mui/icons-material/Delete'
 import EditOutlined from '@mui/icons-material/EditOutlined'
 import Api from '../api'
 import { Comments } from './comments'
+import { EditModal } from './edit-modal'
 
 const getUser = async (idUser) => {
   const { data } = await Api.get(`/users/${idUser}`)
@@ -20,6 +21,10 @@ const getUser = async (idUser) => {
 
 export const CardPost = ({ post, deletePost, editPost }) => {
   const [user, setUser] = useState()
+  const [openModal, setOpenModal] = useState(false)
+
+  const handleOpenModal = () => setOpenModal(true)
+  const handleCloseModal = () => setOpenModal(false)
 
   useEffect(() => {
     getUser(post.userId)
@@ -58,9 +63,11 @@ export const CardPost = ({ post, deletePost, editPost }) => {
               <Button
                 color='primary'
                 startIcon={<EditOutlined />}
+                onClick={() => handleOpenModal()}
               >
                 Edit
               </Button>
+              <EditModal open={openModal} handleCloseModal={handleCloseModal} editPost={editPost} post={post}/>
             </Box>
           </Box>
       }
