@@ -8,3 +8,7 @@
   gap: 2em;
   margin: 0 auto;
 }
+
+.form :nth-child(1)  {
+  font-size: 20px;
+}

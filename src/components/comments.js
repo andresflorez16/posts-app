@@ -9,13 +9,8 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material'
-import Api from '../api'
+import { getComments } from '../api'
 import LoaderRows from './loader-rows'
-
-const getComments = async (postId) => {
-  const { data } = await Api('/comments')
-  return data.filter(el => el.postId === postId)
-}
 
 export const Comments = ({ postId }) => {
   const [comments, setComments] = useState([])

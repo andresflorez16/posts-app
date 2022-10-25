@@ -10,21 +10,30 @@ import {
 } from '@mui/material'
 import DeleteOutlined from '@mui/icons-material/Delete'
 import EditOutlined from '@mui/icons-material/EditOutlined'
-import Api from '../api'
+import { useSnackbar } from 'notistack'
+import { getUser } from '../api'
 import { Comments } from './comments'
 import { EditModal } from './edit-modal'
-
-const getUser = async (idUser) => {
-  const { data } = await Api.get(`/users/${idUser}`)
-  return data
-}
 
 export const CardPost = ({ post, deletePost, editPost }) => {
   const [user, setUser] = useState()
   const [openModal, setOpenModal] = useState(false)
+  const { enqueueSnackbar } = useSnackbar()
 
   const handleOpenModal = () => setOpenModal(true)
   const handleCloseModal = () => setOpenModal(false)
+
+  const handleDeletePost = () => {
+    deletePost(post.id)
+    enqueueSnackbar('Post deleted', {
+      variant: 'error',
+      autoHideDuration: 1500,
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right'
+      }
+    })
+  }
 
   useEffect(() => {
     getUser(post.userId)
@@ -56,12 +65,12 @@ export const CardPost = ({ post, deletePost, editPost }) => {
               <Button 
                 color='error'
                 startIcon={<DeleteOutlined />}
-                onClick={() => deletePost(post.id)}
+                onClick={() => handleDeletePost()}
               >
                 Delete
               </Button>
               <Button
-                color='primary'
+                color='success'
                 startIcon={<EditOutlined />}
                 onClick={() => handleOpenModal()}
               >

@@ -1,66 +1,39 @@
 import { useEffect, useState } from 'react'
-import { Typography, Box, Button } from '@mui/material'
-import AddCircleOutline from '@mui/icons-material/AddCircleOutlineOutlined';
-import Api from './api'
-import { Posts } from './components/posts'
-import { Loader } from './components/loader'
+import { Box, CssBaseline } from '@mui/material'
+import { Routes, Route } from 'react-router-dom'
+import { SnackbarProvider } from 'notistack'
+import { addNewPost, updatePost, getPosts, deletePost } from './api'
+import { ToggleColorMode } from './lib/theme'
+import Home from './Home'
+import { Navbar } from './components/navbar'
 import NewPost from './NewPost'
-import { Routes, Route, Link } from 'react-router-dom'
-
-const addNewPost = async (post) => {
-  await Api.post('/posts', post, { headers: {'Content-type': 'application/json; charset=UTF-8'} })
-}
-
-const updatePost = async (post) => {
-  await Api.put(`/posts/${post.id}`, post, { headers: {'Content-type': 'application/json; charset=UTF-8'} })
-}
-
-const getPosts = async () => {
-  const { data } = await Api.get('/posts')
-  return data
-}
-
-const Home = ({ posts, handleDeletePost, editPost }) => {
-  return (
-    <Box>
-      <Link to='/new-post' style={{ textDecoration: 'none' }}>
-        <Button
-          variant='contained'
-          color='success'
-          startIcon={<AddCircleOutline />}
-          sx={{ marginBottom: 1, marginLeft: 4 }}
-        >
-          New Post
-        </Button>
-      </Link>
-      {
-        posts.length < 1 && <Loader />
-      }
-      {
-        posts.length > 0 && <Posts posts={posts} deletePost={handleDeletePost} editPost={editPost}/>
-      }
-    </Box>
-  );
-}
 
 const App = () => {
   const [posts, setPosts] = useState([])
 
   const handleDeletePost = async (postId) => {
-    console.log(postId)
-    const res = await Api.delete(`/posts/${postId}`)
-    console.log(res)
+    await deletePost(postId)
     setPosts(posts.filter(post => post.id !== postId))
   }
 
   const handleNewPost = async (post) => {
     await addNewPost({ ...post, id: posts.length + 1, userId: 1 })
-    const newPosts = [{ ...post, id: posts.length + 1, userId: 1 }, ...posts]
-    setPosts(newPosts)
+    if(posts.length === 100) {
+      const newPosts = posts.map(el => {
+        if(el.id === 100) {
+          return ({ ...post, id: posts.length, userId: 1 })
+        }
+        return el
+      })
+      setPosts(newPosts)
+    } else {
+      const newPosts = [{ ...post, id: posts.length + 1, userId: 1 }, ...posts]
+      setPosts(newPosts)
+    }
   }
 
   const handleEditPost = async (post) => {
-    //await updatePost(post)
+    await updatePost(post)
     const newPosts = posts.map(el => {
       if(el.id === post.id) return post
       return el
@@ -75,17 +48,18 @@ const App = () => {
   }, [])
 
   return (
-    <Box>
-      <Link to='/' style={{ textDecoration: 'none', color: 'black' }}>
-        <Typography variant='h2' display='inline-block' marginBottom={3}>
-        PostsApp
-        </Typography>
-      </Link>
-      <Routes>
-        <Route path='/' exact element={<Home posts={posts} handleDeletePost={handleDeletePost} editPost={handleEditPost}/>} />
-        <Route path='new-post' exact element={<NewPost posts={posts} newPost={handleNewPost}/>}/>
-      </Routes>
-    </Box>
+    <SnackbarProvider maxSnack={3}>
+      <ToggleColorMode>
+        <CssBaseline />
+        <Box>
+          <Navbar />
+          <Routes>
+            <Route path='/' exact element={<Home posts={posts} handleDeletePost={handleDeletePost} editPost={handleEditPost}/>} />
+            <Route path='new-post' exact element={<NewPost posts={posts} newPost={handleNewPost}/>}/>
+          </Routes>
+        </Box>
+      </ToggleColorMode>
+    </SnackbarProvider>
   )
 }
 

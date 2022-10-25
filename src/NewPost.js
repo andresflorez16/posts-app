@@ -1,14 +1,26 @@
 import { Box, Container, Typography, TextField, Button } from '@mui/material'
 import ErrorOutlined from '@mui/icons-material/ErrorOutlined';
 import PostAddOutlined from '@mui/icons-material/PostAddOutlined';
+import { useSnackbar } from 'notistack'
 import { useForm } from 'react-hook-form'
 import './index.css'
 import { useMin600, useMin500 } from './utils/media-queries'
 
 const NewPost = ({ newPost }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const { enqueueSnackbar } = useSnackbar()
 
-  const onSubmit = data => newPost(data)
+  const onSubmit = data => { 
+    newPost(data) 
+    enqueueSnackbar('Post added', {
+      variant: 'success',
+      autoHideDuration: 1500,
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right'
+      }
+    })
+  }
 
   return (
     <Box
@@ -27,7 +39,7 @@ const NewPost = ({ newPost }) => {
             justifyContent: 'center',
             aligntItems: 'center',
             flexDirection: 'column',
-            gap: 2
+            gap: 2,
           }}
         >
           <TextField

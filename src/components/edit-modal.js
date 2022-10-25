@@ -10,26 +10,36 @@ import {
 } from '@mui/material'
 import ErrorOutlined from '@mui/icons-material/ErrorOutlined';
 import PostAddOutlined from '@mui/icons-material/PostAddOutlined';
+import { useSnackbar } from 'notistack'
 import { useForm } from 'react-hook-form'
+import { useMin500 } from '../utils/media-queries'
 
 const styles = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   borderRadius: '10px',
   boxShadow: 24,
-  p: 4,
+  p: 1,
 }
 
 export const EditModal = ({ open, handleCloseModal, post, editPost }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const { enqueueSnackbar } = useSnackbar()
 
   const onSubmit = (data) => {
     editPost({ ...post, ...data })
+    enqueueSnackbar('Post updated', {
+      variant: 'success',
+      autoHideDuration: 1500,
+      anchorOrigin: {
+        vertical: 'top',
+        horizontal: 'right'
+      }
+    })
   }
 
   return (
@@ -43,8 +53,8 @@ export const EditModal = ({ open, handleCloseModal, post, editPost }) => {
       BackdropProps={{ timeout: 500 }}
     >
       <Fade in={open}>
-        <Box sx={styles}>
-          <Typography variant='h4' my={1}>Edit Post</Typography>
+        <Box sx={{ ...styles, width: useMin500() ? 450 : 400 }}>
+          <Typography variant='h4'>Edit Post</Typography>
           <form
             className='form'
             onSubmit={handleSubmit(onSubmit)}
@@ -60,6 +70,7 @@ export const EditModal = ({ open, handleCloseModal, post, editPost }) => {
             >
               <TextField
                 label='Title'
+                fullWidth
                 defaultValue={post.title}
                 placeholder='Title'
                 {...register('title', { required: true })}
@@ -67,6 +78,7 @@ export const EditModal = ({ open, handleCloseModal, post, editPost }) => {
               {errors.title && <Typography color='error' sx={{ display: 'flex', alignItems: 'center' }}>{<ErrorOutlined color='error' />} The title is Required</Typography>}
               <TextField
                 multiline
+                fullWidth
                 rows={4}
                 label='Description'
                 defaultValue={post.body}
