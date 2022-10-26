@@ -1,6 +1,8 @@
 # Posts App
 This application allows you to view posts, add, edit or delete
 
+On Web: https://posts-app-flax.vercel.app/ 
+
 ## All Post info is supply by
 https://jsonplaceholder.typicode.com/
 
